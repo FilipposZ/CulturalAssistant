@@ -1,12 +1,16 @@
 import os
-import time
+import random
 
 import openai
 import pyttsx3
 
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
-engine = pyttsx3.init()
+tts_engine = pyttsx3.init()
+greetings = [
+  "Haaaa you suckuaaa",
+  "Greetings, my name is Hera, i'm an enthousiast about Culture and History, how may i assist you?"
+]
 
 #openai response
 def openai(text): 
@@ -27,17 +31,22 @@ def openai(text):
 
 # Response audio
 def speak_text(text):
-    engine.setProperty('voice', 'english+f3')
-    engine.setProperty('rate', 150)
-    engine.say(text)
-    engine.runAndWait()
+    tts_engine.setProperty('voice', os.getenv("DEFAULT_VOICE"))
+    tts_engine.setProperty('rate', 150)
+    tts_engine.say(text)
+    tts_engine.runAndWait()
+
+def choose_random_greeting():
+  random_indx = random.randint(0, len(greetings))
+  return greetings[random_indx]
 
 # Main
 def main():
     while True:
         #Introduce
-        print("Greetings, my name is Hera, i'm an enthousiast about Culture and History, how may i assist you?")
-        speak_text("Greetings, my name is Hera, i'm an enthousiast about Culture and History, how may i assist you?")
+        greeting = choose_random_greeting()
+        print(greeting)
+        speak_text(greeting)
         
         #User input
         user_input = input("Εισάγετε το κείμενο σας: ")
