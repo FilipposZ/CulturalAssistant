@@ -1,5 +1,6 @@
 import os
 import random
+import re
 
 import openai
 import pyttsx3
@@ -11,7 +12,6 @@ openai.api_key = os.getenv("OPENAI_API_KEY")
 model_id = 'gpt-3.5-turbo'
 
 #gTTS engine
-tts_engine = pyttsx3.init()
 greetings = "Greetings, my name is Iris, i'm an enthousiast about Culture and History, how may i assist you?"
 
 
@@ -28,43 +28,57 @@ def generate_response(prompt_text):
   print(completion.choices[0].message)
   return completion.choices[0].message
 
+
+class AudioManager:
+  def __init__(self):
+    self.engine = pyttsx3.init()
+    self.engine.setProperty('rate', 150)
+    self.rate = self.engine.getProperty('rate')
+    self.count_uses = 0
+    self.available_voices = self.engine.getProperty('voices')
     
-
-
-#openai response
-# def openai(text): 
-#    def generate_response(prompt_text):
-#       response = openai.Completion.create(
-#         engine='text-davinci-003',
-#         prompt=messages,
-#         echo=True
-#     )
-#       return response['choices'][0]['text']
-#    return generate_response(text)
-
-
-# Response audio
-def speak_text(text):
-    tts_engine.setProperty('voice', os.getenv("DEFAULT_VOICE"))
-    tts_engine.setProperty('rate', 150)
-    tts_engine.say(text)
-    tts_engine.runAndWait()
-
+  @property
+  def volume(self):
+    self.volume = self.engine.setProperty('volume', 0)
+    
+  @volume.setter
+  def volume(self, value = 1):
+    self.engine.setProperty('volume', value)
+    self._volume = self.engine.getProperty('volume')
+    
+  @property 
+  def voice(self):
+    return self._voice
+    
+  @voice.setter
+  def voice(self, voiceid):
+    self.engine.setProperty('voice', voiceid)
+    self._voice = self.engine.getProperty('voice')
+  
+  def speak(self, text):
+    print(f"Speaking text: {text}")
+    self.voice = self.available_voices[self.count_uses % len(self.available_voices)].id
+    self.count_uses += 1
+    
+    self.engine.say(text)
+    self.engine.runAndWait()
 
 # Main
 def main():
-    while True:
-        #Introduce
-        print(greetings)
-        speak_text(greetings)
-        
-        #User input
-        user_input = input("Εισάγετε το κείμενο σας: ")
+  audioManager = AudioManager()
+  
+  while True:
+    #Introduce
+    print(greetings)
+    
+    audioManager.speak(re.split('\. |, ', greetings))
+    
+    #User input
+    user_input = input("Εισάγετε το κείμενο σας: ")
 
-        #Openai response
-        response = generate_response(user_input)
-        print(response)
-        speak_text(response)
+    #Openai response
+    response = generate_response(user_input)
+    audioManager.speak(response)
 
-if __name__ == '__main__': 
+if __name__ == '__main__':
   main()
