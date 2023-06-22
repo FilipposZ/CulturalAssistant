@@ -1,3 +1,4 @@
 openai
 pyttsx3
 espeak
+python-dotenv
