@@ -6,28 +6,29 @@ class AudioManager:
 
   It is responsible for managing the text-to-speech voice.
   """
-  def __init__(self):
+  
+  def __init__(self, voice: int = 0, rate: int = 125, volume: float = 1):
     self.engine = pyttsx3.init()
     self.available_voices = self.engine.getProperty('voices')
   
-    self.engine.setProperty('voice', self.available_voices[0].id)
-    self.engine.setProperty('rate', 125)
-    self.engine.setProperty('volume', 1.0)
+    self.voice = self.available_voices[voice].id
+    self.rate = rate
+    self.volume = volume
     
   def speak(self, text: str):
     """The main function of the audio manager. A voice speaks the given :attr:`text`."""
     print(f"Speaking the text: {text}")    
     self.engine.say(text)
     self.engine.runAndWait()
-  
+
   @property
   def voice(self) -> str:
     """The selected voice of the text-to-speech engine."""
     return self.engine.getProperty('voice')
   
   @voice.setter
-  def voice(self, voice: str):
-    self.engine.setProperty('voice', voice)
+  def voice(self, voiceid: str):    
+    self.engine.setProperty('voice', voiceid)
     
   @property
   def rate(self) -> int:
